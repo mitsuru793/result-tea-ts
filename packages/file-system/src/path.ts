@@ -2,12 +2,12 @@ import { R } from "@praha/byethrow";
 import * as p from "@std/path";
 import { JoinPathError, PathError, ResolveExecPathError } from "./errors.ts";
 
-export type ParentDir = (path: string) => R.Result<string, PathError>;
+export type ParentDirectory = (path: string) => R.Result<string, PathError>;
 
-export const parentDir: ParentDir = (path) => {
+export const parentDirectory: ParentDirectory = (path) => {
   try {
-    const dir = p.dirname(path);
-    return R.succeed(dir);
+    const directory = p.dirname(path);
+    return R.succeed(directory);
   } catch (error) {
     return R.fail(new PathError({ cause: error, path }));
   }

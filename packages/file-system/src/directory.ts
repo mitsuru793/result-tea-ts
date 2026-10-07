@@ -1,12 +1,12 @@
 import { R } from "@praha/byethrow";
 
-import { ensureDirSync, expandGlob, WalkEntry } from "@std/fs";
+import { ensureDirSync, expandGlob, type WalkEntry } from "@std/fs";
 
 import {
   CreateDirectoryError,
-  ReadDirError,
+  ReadDirectoryError,
   ReadGlobError,
-  RemoveDirError,
+  RemoveDirectoryError,
   WriteFileError,
 } from "./errors.ts";
 
@@ -27,8 +27,8 @@ export type CreateTmp = (
 
 export const createTmp: CreateTmp = (prefix = "") => {
   try {
-    const tempDir = Deno.makeTempDirSync({ prefix });
-    return R.succeed(tempDir);
+    const tempDirectory = Deno.makeTempDirSync({ prefix });
+    return R.succeed(tempDirectory);
   } catch (error) {
     return R.fail(new CreateDirectoryError({ cause: error, path: prefix }));
   }
@@ -73,18 +73,20 @@ export const glob: Glob = (options = {}) => (pattern) => {
   }
 };
 
-export type RemoveForce = (path: string) => R.Result<void, RemoveDirError>;
+export type RemoveForce = (
+  path: string,
+) => R.Result<void, RemoveDirectoryError>;
 
 export const removeForce: RemoveForce = (path) => {
   try {
     Deno.removeSync(path, { recursive: true });
     return R.succeed(undefined);
   } catch (error) {
-    return R.fail(new RemoveDirError({ cause: error, path }));
+    return R.fail(new RemoveDirectoryError({ cause: error, path }));
   }
 };
 
-export type IsEmpty = (path: string) => R.Result<boolean, ReadDirError>;
+export type IsEmpty = (path: string) => R.Result<boolean, ReadDirectoryError>;
 
 export const isEmpty: IsEmpty = (path) => {
   try {
@@ -93,11 +95,11 @@ export const isEmpty: IsEmpty = (path) => {
     }
     return R.succeed(true);
   } catch (error) {
-    return R.fail(new ReadDirError({ cause: error, path }));
+    return R.fail(new ReadDirectoryError({ cause: error, path }));
   }
 };
 
-export type IsFilled = (path: string) => R.Result<boolean, ReadDirError>;
+export type IsFilled = (path: string) => R.Result<boolean, ReadDirectoryError>;
 
 export const isFilled: IsFilled = (path) => {
   try {
@@ -106,6 +108,6 @@ export const isFilled: IsFilled = (path) => {
     }
     return R.succeed(false);
   } catch (error) {
-    return R.fail(new ReadDirError({ cause: error, path }));
+    return R.fail(new ReadDirectoryError({ cause: error, path }));
   }
 };

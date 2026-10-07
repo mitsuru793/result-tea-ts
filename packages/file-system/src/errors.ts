@@ -24,8 +24,8 @@ export class ReadGlobError extends ErrorFactory({
   fields: ErrorFactory.fields<{ pattern: string }>(),
 }) {}
 
-export class ReadDirError extends ErrorFactory({
-  name: "ReadDirError",
+export class ReadDirectoryError extends ErrorFactory({
+  name: "ReadDirectoryError",
   message: ({ path }) => `Cannot read the directory "${path}"`,
   fields: ErrorFactory.fields<{ path: string }>(),
 }) {}
@@ -53,8 +53,8 @@ export class ResolveExecPathError extends ErrorFactory({
   message: "Cannot resolve the executable path",
 }) {}
 
-export class RemoveDirError extends ErrorFactory({
-  name: "RemoveDirError",
+export class RemoveDirectoryError extends ErrorFactory({
+  name: "RemoveDirectoryError",
   message: ({ path }) => `Cannot remove the directory "${path}"`,
   fields: ErrorFactory.fields<{ path: string }>(),
 }) {}

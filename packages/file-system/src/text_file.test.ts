@@ -17,7 +17,7 @@ function fileSystemTest(
   Deno.test({ name, fn, permissions: { read: true, write: true } });
 }
 
-async function withTempDir(
+async function withTempDirectory(
   fn: (root: string) => void | Promise<void>,
 ): Promise<void> {
   const root = Deno.makeTempDirSync();
@@ -29,7 +29,7 @@ async function withTempDir(
 }
 
 fileSystemTest("write() creates or replaces file content", async () => {
-  await withTempDir((root) => {
+  await withTempDirectory((root) => {
     const path = `${root}/file.txt`;
 
     withSuccess(write("initial")(path), (actual) => {
@@ -43,7 +43,7 @@ fileSystemTest("write() creates or replaces file content", async () => {
 });
 
 fileSystemTest("read() returns file content", async () => {
-  await withTempDir((root) => {
+  await withTempDirectory((root) => {
     const path = `${root}/file.txt`;
     Deno.writeTextFileSync(path, "content");
 
@@ -54,7 +54,7 @@ fileSystemTest("read() returns file content", async () => {
 });
 
 fileSystemTest("append() adds content to the end of a file", async () => {
-  await withTempDir((root) => {
+  await withTempDirectory((root) => {
     const path = `${root}/file.txt`;
     Deno.writeTextFileSync(path, "first");
 
@@ -68,7 +68,7 @@ fileSystemTest("append() adds content to the end of a file", async () => {
 fileSystemTest(
   "prepend() adds content to the beginning of a file",
   async () => {
-    await withTempDir((root) => {
+    await withTempDirectory((root) => {
       const path = `${root}/file.txt`;
       Deno.writeTextFileSync(path, "last");
 
@@ -81,7 +81,7 @@ fileSystemTest(
 );
 
 fileSystemTest("remove() removes a file", async () => {
-  await withTempDir((root) => {
+  await withTempDirectory((root) => {
     const path = `${root}/file.txt`;
     Deno.writeTextFileSync(path, "content");
 
@@ -95,7 +95,7 @@ fileSystemTest("remove() removes a file", async () => {
 });
 
 fileSystemTest("isEmpty() returns true for empty files", async () => {
-  await withTempDir((root) => {
+  await withTempDirectory((root) => {
     Deno.writeTextFileSync(`${root}/empty.txt`, "");
     Deno.writeTextFileSync(`${root}/filled.txt`, "content");
 
@@ -109,7 +109,7 @@ fileSystemTest("isEmpty() returns true for empty files", async () => {
 });
 
 fileSystemTest("isFilled() returns true for non-empty files", async () => {
-  await withTempDir((root) => {
+  await withTempDirectory((root) => {
     Deno.writeTextFileSync(`${root}/empty.txt`, "");
     Deno.writeTextFileSync(`${root}/filled.txt`, "content");
 
@@ -126,7 +126,7 @@ fileSystemTest("isFilled() returns true for non-empty files", async () => {
 fileSystemTest(
   "file operations return failures for invalid paths",
   async () => {
-    await withTempDir((root) => {
+    await withTempDirectory((root) => {
       const missingPath = `${root}/missing/file.txt`;
 
       withFailure(write("content")(missingPath), (error) => {

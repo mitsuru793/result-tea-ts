@@ -6,15 +6,15 @@ import {
   execPath,
   join,
   lastExtension,
-  parentDir,
+  parentDirectory,
 } from "./path.ts";
 
-Deno.test("parentDir() returns the parent directory", () => {
-  withSuccess(parentDir("src/path.ts"), (actual) => {
+Deno.test("parentDirectory() returns the parent directory", () => {
+  withSuccess(parentDirectory("src/path.ts"), (actual) => {
     assertEquals(actual, "src");
   });
-  withSuccess(parentDir("src/dir1/dir2/"), (actual) => {
-    assertEquals(actual, "src/dir1");
+  withSuccess(parentDirectory("src/directory1/directory2/"), (actual) => {
+    assertEquals(actual, "src/directory1");
   });
 });
 

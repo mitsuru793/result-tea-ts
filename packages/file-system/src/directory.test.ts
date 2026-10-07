@@ -10,7 +10,7 @@ import {
   isFilled,
   removeForce,
   writeFile,
-} from "./dir.ts";
+} from "./directory.ts";
 
 function fileSystemTest(
   name: string,
@@ -19,7 +19,7 @@ function fileSystemTest(
   Deno.test({ name, fn, permissions: { read: true, write: true } });
 }
 
-async function withTempDir(
+async function withTempDirectory(
   fn: (root: string) => void | Promise<void>,
 ): Promise<void> {
   const root = Deno.makeTempDirSync();
@@ -31,7 +31,7 @@ async function withTempDir(
 }
 
 fileSystemTest("create() creates nested directories", async () => {
-  await withTempDir((root) => {
+  await withTempDirectory((root) => {
     const path = `${root}/one/two`;
 
     withSuccess(create(path), (actual) => {
@@ -62,7 +62,7 @@ fileSystemTest(
 );
 
 fileSystemTest("ensure() creates a directory that does not exist", async () => {
-  await withTempDir((root) => {
+  await withTempDirectory((root) => {
     const path = `${root}/created`;
 
     withSuccess(ensure(path), (actual) => {
@@ -79,7 +79,7 @@ fileSystemTest("ensure() creates a directory that does not exist", async () => {
 });
 
 fileSystemTest("writeFile() writes content to a file", async () => {
-  await withTempDir((root) => {
+  await withTempDirectory((root) => {
     const path = `${root}/file.txt`;
 
     withSuccess(writeFile("content")(path), (actual) => {
@@ -90,7 +90,7 @@ fileSystemTest("writeFile() writes content to a file", async () => {
 });
 
 fileSystemTest("glob() lists files matching a pattern", async () => {
-  await withTempDir(async (root) => {
+  await withTempDirectory(async (root) => {
     Deno.writeTextFileSync(`${root}/first.txt`, "1");
     Deno.writeTextFileSync(`${root}/second.txt`, "2");
     Deno.writeTextFileSync(`${root}/ignored.md`, "3");
@@ -111,7 +111,7 @@ fileSystemTest("glob() lists files matching a pattern", async () => {
 fileSystemTest(
   "removeForce() removes a directory and its contents",
   async () => {
-    await withTempDir((root) => {
+    await withTempDirectory((root) => {
       const path = `${root}/to-remove`;
       Deno.mkdirSync(`${path}/nested`, { recursive: true });
       Deno.writeTextFileSync(`${path}/nested/file.txt`, "content");
@@ -125,7 +125,7 @@ fileSystemTest(
 );
 
 fileSystemTest("isEmpty() returns true for empty directories", async () => {
-  await withTempDir((root) => {
+  await withTempDirectory((root) => {
     Deno.mkdirSync(`${root}/empty`);
     Deno.mkdirSync(`${root}/filled`);
     Deno.writeTextFileSync(`${root}/filled/file.txt`, "content");
@@ -142,7 +142,7 @@ fileSystemTest("isEmpty() returns true for empty directories", async () => {
 fileSystemTest(
   "isEmpty() and isFilled() report whether a directory has entries",
   async () => {
-    await withTempDir((root) => {
+    await withTempDirectory((root) => {
       Deno.mkdirSync(`${root}/empty`);
       Deno.mkdirSync(`${root}/filled`);
       Deno.writeTextFileSync(`${root}/filled/file.txt`, "content");
@@ -160,7 +160,7 @@ fileSystemTest(
 fileSystemTest(
   "directory operations return failures for invalid paths",
   async () => {
-    await withTempDir((root) => {
+    await withTempDirectory((root) => {
       const missingPath = `${root}/missing/file.txt`;
       Deno.writeTextFileSync(`${root}/file`, "not a directory");
 
