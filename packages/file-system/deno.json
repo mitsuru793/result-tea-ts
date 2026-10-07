@@ -1,5 +1,5 @@
 {
-  "name": "@mitsuru793/bythrow-file-system",
+  "name": "@result-tea/file-system",
   "version": "0.0.0",
   "exports": {
     ".": "./mod.ts"

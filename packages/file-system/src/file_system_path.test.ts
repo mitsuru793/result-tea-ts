@@ -1,5 +1,5 @@
 import { assertEquals, assertInstanceOf } from "@std/assert";
-import { withFailure, withSuccess } from "@mitsuru793/bythrow-assert";
+import { withFailure, withSuccess } from "@result-tea/bythrow-assert";
 import { ParseError } from "@result-tea/valibot";
 import * as v from "valibot";
 import { FileSystemPath, TextFileData } from "./mod.ts";

@@ -3,7 +3,7 @@ import {
   assertInstanceOf,
   assertStrictEquals,
 } from "@std/assert";
-import { withFailure, withSuccess } from "@mitsuru793/bythrow-assert";
+import { withFailure, withSuccess } from "@result-tea/bythrow-assert";
 import * as v from "valibot";
 import {
   createParse,

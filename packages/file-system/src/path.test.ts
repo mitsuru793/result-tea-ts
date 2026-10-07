@@ -1,5 +1,5 @@
 import { assertEquals } from "@std/assert";
-import { withSuccess } from "@mitsuru793/bythrow-assert";
+import { withSuccess } from "@result-tea/bythrow-assert";
 import {
   allExtensions,
   baseName,

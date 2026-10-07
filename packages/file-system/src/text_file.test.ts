@@ -3,7 +3,7 @@ import {
   assertInstanceOf,
   assertStrictEquals,
 } from "@std/assert";
-import { withFailure, withSuccess } from "@mitsuru793/bythrow-assert";
+import { withFailure, withSuccess } from "@result-tea/bythrow-assert";
 import { FileSystemError } from "./file_system_error.ts";
 import {
   append,

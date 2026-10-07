@@ -1,5 +1,5 @@
 {
-  "name": "@mitsuru793/bythrow-assert",
+  "name": "@result-tea/bythrow-assert",
   "version": "0.0.0",
   "exports": {
     ".": "./src/mod.ts"
