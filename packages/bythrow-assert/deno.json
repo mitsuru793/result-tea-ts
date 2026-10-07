@@ -2,7 +2,7 @@
   "name": "@mitsuru793/bythrow-assert",
   "version": "0.0.0",
   "exports": {
-    ".": "./mod.ts"
+    ".": "./src/mod.ts"
   },
   "tasks": {
     "test": "deno test --allow-read --allow-write"
