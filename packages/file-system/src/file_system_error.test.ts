@@ -5,11 +5,11 @@ import {
 } from "@std/assert";
 import {
   classifyCause,
-  createFileSystemError,
   FileSystemError,
   type FileSystemErrorCode,
   type FileSystemErrorContext,
-} from "./errors.ts";
+} from "./file_system_error.ts";
+import { FileSystemError as PublicFileSystemError } from "./mod.ts";
 
 const cases = {
   NOT_FOUND: [new Deno.errors.NotFound("missing")],
@@ -23,11 +23,21 @@ for (const [code, causes] of Object.entries(cases)) {
   Deno.test(`classifyCause() returns ${code}`, () => {
     for (const cause of causes) {
       assertEquals(classifyCause(cause), code);
+      const context = { operation: "read", path: "file.txt" } as const;
+      const error = FileSystemError.fromCause(context, cause);
+      assertInstanceOf(error, FileSystemError);
+      assertEquals(error.code, code);
+      assertEquals(error.context, context);
+      assertStrictEquals(error.cause, cause);
     }
   });
 }
 
-Deno.test("createFileSystemError preserves every context shape and unknown causes", () => {
+Deno.test("the public entry point exports the FileSystemError class", () => {
+  assertStrictEquals(PublicFileSystemError, FileSystemError);
+});
+
+Deno.test("FileSystemError.fromCause preserves every context shape and unknown causes", () => {
   const contexts = [
     { operation: "read", path: "file.txt" },
     { operation: "prepend", path: "file.txt", phase: "read" },
@@ -39,7 +49,7 @@ Deno.test("createFileSystemError preserves every context shape and unknown cause
 
   for (const context of contexts) {
     const cause = "unexpected failure";
-    const error = createFileSystemError(context, cause);
+    const error = FileSystemError.fromCause(context, cause);
     assertInstanceOf(error, FileSystemError);
     assertEquals(error.code, "UNKNOWN");
     assertEquals(error.context, context);

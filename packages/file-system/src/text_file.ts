@@ -1,5 +1,5 @@
 import { R } from "@praha/byethrow";
-import { createFileSystemError, type FileSystemError } from "./errors.ts";
+import { FileSystemError } from "./file_system_error.ts";
 
 type Write = (
   content: string,
@@ -11,7 +11,7 @@ export const write: Write = (content) => (path) => {
     return R.succeed(undefined);
   } catch (error) {
     return R.fail(
-      createFileSystemError({ operation: "write", path }, error),
+      FileSystemError.fromCause({ operation: "write", path }, error),
     );
   }
 };
@@ -23,7 +23,9 @@ export const read: Read = (path) => {
     const content = Deno.readTextFileSync(path);
     return R.succeed(content);
   } catch (error) {
-    return R.fail(createFileSystemError({ operation: "read", path }, error));
+    return R.fail(
+      FileSystemError.fromCause({ operation: "read", path }, error),
+    );
   }
 };
 
@@ -36,7 +38,9 @@ export const append: Append = (content) => (path) => {
     Deno.writeTextFileSync(path, content, { append: true });
     return R.succeed(undefined);
   } catch (error) {
-    return R.fail(createFileSystemError({ operation: "append", path }, error));
+    return R.fail(
+      FileSystemError.fromCause({ operation: "append", path }, error),
+    );
   }
 };
 
@@ -53,7 +57,7 @@ export const prepend: Prepend = (content) => (path) => {
     return R.succeed(undefined);
   } catch (error) {
     return R.fail(
-      createFileSystemError({ operation: "prepend", path, phase }, error),
+      FileSystemError.fromCause({ operation: "prepend", path, phase }, error),
     );
   }
 };
@@ -65,7 +69,9 @@ export const remove: Remove = (path) => {
     Deno.removeSync(path);
     return R.succeed(undefined);
   } catch (error) {
-    return R.fail(createFileSystemError({ operation: "remove", path }, error));
+    return R.fail(
+      FileSystemError.fromCause({ operation: "remove", path }, error),
+    );
   }
 };
 
@@ -76,7 +82,9 @@ export const isEmpty: IsEmpty = (path) => {
     const content = Deno.readTextFileSync(path);
     return R.succeed(content.length === 0);
   } catch (error) {
-    return R.fail(createFileSystemError({ operation: "read", path }, error));
+    return R.fail(
+      FileSystemError.fromCause({ operation: "read", path }, error),
+    );
   }
 };
 
@@ -87,6 +95,8 @@ export const isFilled: IsFilled = (path) => {
     const content = Deno.readTextFileSync(path);
     return R.succeed(content.length > 0);
   } catch (error) {
-    return R.fail(createFileSystemError({ operation: "read", path }, error));
+    return R.fail(
+      FileSystemError.fromCause({ operation: "read", path }, error),
+    );
   }
 };

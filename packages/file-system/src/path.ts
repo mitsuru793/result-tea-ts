@@ -1,6 +1,6 @@
 import { R } from "@praha/byethrow";
 import * as p from "@std/path";
-import { createFileSystemError, type FileSystemError } from "./errors.ts";
+import { FileSystemError } from "./file_system_error.ts";
 
 export type ParentDirectory = (
   path: string,
@@ -12,7 +12,7 @@ export const parentDirectory: ParentDirectory = (path) => {
     return R.succeed(directory);
   } catch (error) {
     return R.fail(
-      createFileSystemError({ operation: "parentDirectory", path }, error),
+      FileSystemError.fromCause({ operation: "parentDirectory", path }, error),
     );
   }
 };
@@ -29,7 +29,7 @@ export const lastExtension: LastExtension = (path) => {
     return R.succeed(ext);
   } catch (error) {
     return R.fail(
-      createFileSystemError({ operation: "lastExtension", path }, error),
+      FileSystemError.fromCause({ operation: "lastExtension", path }, error),
     );
   }
 };
@@ -48,7 +48,7 @@ export const allExtensions: AllExtensions = (path) => {
     return R.succeed(exts);
   } catch (error) {
     return R.fail(
-      createFileSystemError({ operation: "allExtensions", path }, error),
+      FileSystemError.fromCause({ operation: "allExtensions", path }, error),
     );
   }
 };
@@ -61,7 +61,7 @@ export const baseName: BaseName = (path) => {
     return R.succeed(base);
   } catch (error) {
     return R.fail(
-      createFileSystemError({ operation: "baseName", path }, error),
+      FileSystemError.fromCause({ operation: "baseName", path }, error),
     );
   }
 };
@@ -73,7 +73,9 @@ export const join: Join = (paths) => {
     const joined = paths.join("/");
     return R.succeed(joined);
   } catch (error) {
-    return R.fail(createFileSystemError({ operation: "join", paths }, error));
+    return R.fail(
+      FileSystemError.fromCause({ operation: "join", paths }, error),
+    );
   }
 };
 
@@ -84,6 +86,6 @@ export const execPath: ExecPath = () => {
     const path = Deno.execPath();
     return R.succeed(path);
   } catch (error) {
-    return R.fail(createFileSystemError({ operation: "execPath" }, error));
+    return R.fail(FileSystemError.fromCause({ operation: "execPath" }, error));
   }
 };

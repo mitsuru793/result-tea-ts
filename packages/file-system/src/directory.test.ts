@@ -1,6 +1,6 @@
 import { assertEquals, assertInstanceOf, assertThrows } from "@std/assert";
 import { withFailure, withSuccess } from "@mitsuru793/bythrow-assert";
-import { FileSystemError } from "./errors.ts";
+import { FileSystemError } from "./file_system_error.ts";
 
 import {
   create,

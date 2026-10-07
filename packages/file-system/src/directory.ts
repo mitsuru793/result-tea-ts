@@ -2,7 +2,7 @@ import { R } from "@praha/byethrow";
 
 import { ensureDirSync, expandGlob, type WalkEntry } from "@std/fs";
 
-import { createFileSystemError, type FileSystemError } from "./errors.ts";
+import { FileSystemError } from "./file_system_error.ts";
 
 export type Create = (path: string) => R.Result<void, FileSystemError>;
 
@@ -12,7 +12,7 @@ export const create: Create = (path) => {
     return R.succeed(undefined);
   } catch (error) {
     return R.fail(
-      createFileSystemError({ operation: "createDirectory", path }, error),
+      FileSystemError.fromCause({ operation: "createDirectory", path }, error),
     );
   }
 };
@@ -27,7 +27,7 @@ export const createTmp: CreateTmp = (prefix = "") => {
     return R.succeed(tempDirectory);
   } catch (error) {
     return R.fail(
-      createFileSystemError(
+      FileSystemError.fromCause(
         { operation: "createTemporaryDirectory", prefix },
         error,
       ),
@@ -43,7 +43,7 @@ export const ensure: Ensure = (path) => {
     return R.succeed(undefined);
   } catch (error) {
     return R.fail(
-      createFileSystemError({ operation: "ensureDirectory", path }, error),
+      FileSystemError.fromCause({ operation: "ensureDirectory", path }, error),
     );
   }
 };
@@ -58,7 +58,7 @@ export const writeFile: WriteFile = (content) => (childPath) => {
     return R.succeed(undefined);
   } catch (error) {
     return R.fail(
-      createFileSystemError({ operation: "write", path: childPath }, error),
+      FileSystemError.fromCause({ operation: "write", path: childPath }, error),
     );
   }
 };
@@ -74,7 +74,9 @@ export const glob: Glob = (options = {}) => (pattern) => {
     const files = expandGlob(pattern, options);
     return R.succeed(files);
   } catch (error) {
-    return R.fail(createFileSystemError({ operation: "glob", pattern }, error));
+    return R.fail(
+      FileSystemError.fromCause({ operation: "glob", pattern }, error),
+    );
   }
 };
 
@@ -88,7 +90,7 @@ export const removeForce: RemoveForce = (path) => {
     return R.succeed(undefined);
   } catch (error) {
     return R.fail(
-      createFileSystemError({ operation: "removeDirectory", path }, error),
+      FileSystemError.fromCause({ operation: "removeDirectory", path }, error),
     );
   }
 };
@@ -103,7 +105,7 @@ export const isEmpty: IsEmpty = (path) => {
     return R.succeed(true);
   } catch (error) {
     return R.fail(
-      createFileSystemError({ operation: "readDirectory", path }, error),
+      FileSystemError.fromCause({ operation: "readDirectory", path }, error),
     );
   }
 };
@@ -118,7 +120,7 @@ export const isFilled: IsFilled = (path) => {
     return R.succeed(false);
   } catch (error) {
     return R.fail(
-      createFileSystemError({ operation: "readDirectory", path }, error),
+      FileSystemError.fromCause({ operation: "readDirectory", path }, error),
     );
   }
 };

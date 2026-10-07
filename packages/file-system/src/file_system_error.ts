@@ -69,15 +69,15 @@ export class FileSystemError extends ErrorFactory({
     code: FileSystemErrorCode;
     context: FileSystemErrorContext;
   }>(),
-}) {}
-
-export function createFileSystemError(
-  context: FileSystemErrorContext,
-  cause: unknown,
-): FileSystemError {
-  return new FileSystemError({
-    code: classifyCause(cause),
-    context,
-    cause,
-  });
+}) {
+  static fromCause(
+    context: FileSystemErrorContext,
+    cause: unknown,
+  ): FileSystemError {
+    return new FileSystemError({
+      code: classifyCause(cause),
+      context,
+      cause,
+    });
+  }
 }
