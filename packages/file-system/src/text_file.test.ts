@@ -7,6 +7,7 @@ import { withFailure, withSuccess } from "@result-tea/bythrow-assert";
 import { FileSystemError } from "./file_system_error.ts";
 import {
   append,
+  ensure,
   isEmpty,
   isFilled,
   prepend,
@@ -71,6 +72,27 @@ fileSystemTest("read() returns file content", async () => {
     });
   });
 });
+
+fileSystemTest(
+  "ensure() creates a missing file and preserves existing content",
+  async () => {
+    await withTempDirectory((root) => {
+      const missingPath = `${root}/missing.txt`;
+      const existingPath = `${root}/existing.txt`;
+      Deno.writeTextFileSync(existingPath, "existing content");
+
+      withSuccess(ensure(missingPath), (actual) => {
+        assertEquals(actual, undefined);
+      });
+      withSuccess(ensure(existingPath), (actual) => {
+        assertEquals(actual, undefined);
+      });
+
+      assertEquals(Deno.readTextFileSync(missingPath), "");
+      assertEquals(Deno.readTextFileSync(existingPath), "existing content");
+    });
+  },
+);
 
 fileSystemTest("append() adds content to the end of a file", async () => {
   await withTempDirectory((root) => {
@@ -162,6 +184,12 @@ fileSystemTest(
         assertInstanceOf(error, FileSystemError);
         assertEquals(error.code, "NOT_FOUND");
         assertEquals(error.context, { operation: "read", path: missingPath });
+        assertInstanceOf(error.cause, Deno.errors.NotFound);
+      });
+      withFailure(ensure(missingPath), (error) => {
+        assertInstanceOf(error, FileSystemError);
+        assertEquals(error.code, "NOT_FOUND");
+        assertEquals(error.context, { operation: "ensure", path: missingPath });
         assertInstanceOf(error.cause, Deno.errors.NotFound);
       });
       withFailure(append("content")(missingPath), (error) => {

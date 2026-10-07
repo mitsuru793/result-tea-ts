@@ -30,6 +30,7 @@ export type FileSystemErrorContext =
       | "write"
       | "remove"
       | "append"
+      | "ensure"
       | "createDirectory"
       | "ensureDirectory"
       | "removeDirectory"

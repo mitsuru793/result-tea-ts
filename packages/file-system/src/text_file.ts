@@ -29,6 +29,20 @@ export const read: Read = (path) => {
   }
 };
 
+export type Ensure = (path: string) => R.Result<void, FileSystemError>;
+
+export const ensure: Ensure = (path) => {
+  try {
+    const file = Deno.openSync(path, { create: true, write: true });
+    file.close();
+    return R.succeed(undefined);
+  } catch (error) {
+    return R.fail(
+      FileSystemError.fromCause({ operation: "ensure", path }, error),
+    );
+  }
+};
+
 type Append = (
   content: string,
 ) => (path: string) => R.Result<void, FileSystemError>;
