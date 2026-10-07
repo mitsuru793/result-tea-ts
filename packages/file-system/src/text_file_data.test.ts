@@ -1,7 +1,8 @@
 import { assertEquals, assertInstanceOf } from "@std/assert";
 import { withFailure, withSuccess } from "@mitsuru793/bythrow-assert";
 import * as v from "valibot";
-import { ParseError, TextFileData } from "./mod.ts";
+import { ParseError } from "@result-tea/valibot";
+import { TextFileData } from "./mod.ts";
 
 Deno.test.each([
   { name: ".txt extension", path: "hello.txt" },

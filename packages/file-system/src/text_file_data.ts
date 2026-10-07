@@ -1,7 +1,6 @@
 import type { R } from "@praha/byethrow";
 import * as v from "valibot";
-import { createParse } from "./model.ts";
-import type { ParseError } from "./parse_error.ts";
+import { createParse, type ParseFailure } from "@result-tea/valibot";
 
 /** Text to write at a path, regardless of extension or file existence. */
 export const schema = v.pipe(
@@ -19,7 +18,7 @@ export type Type = v.InferOutput<typeof schema>;
 /** Validates unknown data without I/O; unknown object keys are removed. */
 export const parse = createParse(schema);
 
-export type Create = (input: Input) => R.Result<Type, ParseError>;
+export type Create = (input: Input) => R.Result<Type, ParseFailure>;
 
 /** Constructs a validated model, not a file on disk. */
 export const create: Create = (input) => parse(input);
