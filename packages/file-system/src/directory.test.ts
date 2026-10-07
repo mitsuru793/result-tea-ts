@@ -1,5 +1,6 @@
-import { assertEquals, assertThrows } from "@std/assert";
-import { withSuccess } from "@mitsuru793/bythrow-assert";
+import { assertEquals, assertInstanceOf, assertThrows } from "@std/assert";
+import { withFailure, withSuccess } from "@mitsuru793/bythrow-assert";
+import { FileSystemError } from "./errors.ts";
 
 import {
   create,
@@ -164,11 +165,66 @@ fileSystemTest(
       const missingPath = `${root}/missing/file.txt`;
       Deno.writeTextFileSync(`${root}/file`, "not a directory");
 
-      assertEquals(create(`${root}/file/child`).type, "Failure");
-      assertEquals(writeFile("content")(missingPath).type, "Failure");
-      assertEquals(removeForce(missingPath).type, "Failure");
-      assertEquals(isEmpty(missingPath).type, "Failure");
-      assertEquals(isFilled(missingPath).type, "Failure");
+      const blockedPath = `${root}/file/child`;
+      withFailure(create(blockedPath), (error) => {
+        assertInstanceOf(error, FileSystemError);
+        assertEquals(error.context, {
+          operation: "createDirectory",
+          path: blockedPath,
+        });
+        assertInstanceOf(error.cause, Error);
+      });
+      withFailure(ensure(blockedPath), (error) => {
+        assertInstanceOf(error, FileSystemError);
+        assertEquals(error.context, {
+          operation: "ensureDirectory",
+          path: blockedPath,
+        });
+        assertInstanceOf(error.cause, Error);
+      });
+      withFailure(writeFile("content")(missingPath), (error) => {
+        assertInstanceOf(error, FileSystemError);
+        assertEquals(error.code, "NOT_FOUND");
+        assertEquals(error.context, { operation: "write", path: missingPath });
+        assertInstanceOf(error.cause, Deno.errors.NotFound);
+      });
+      withFailure(removeForce(missingPath), (error) => {
+        assertInstanceOf(error, FileSystemError);
+        assertEquals(error.code, "NOT_FOUND");
+        assertEquals(error.context, {
+          operation: "removeDirectory",
+          path: missingPath,
+        });
+        assertInstanceOf(error.cause, Deno.errors.NotFound);
+      });
+      for (const check of [isEmpty, isFilled]) {
+        withFailure(check(missingPath), (error) => {
+          assertInstanceOf(error, FileSystemError);
+          assertEquals(error.code, "NOT_FOUND");
+          assertEquals(error.context, {
+            operation: "readDirectory",
+            path: missingPath,
+          });
+          assertInstanceOf(error.cause, Deno.errors.NotFound);
+        });
+      }
     });
   },
 );
+
+Deno.test({
+  name: "createTmp() preserves the prefix when write permission is denied",
+  permissions: { write: false },
+  fn: () => {
+    const prefix = "file-system-test-";
+    withFailure(createTmp(prefix), (error) => {
+      assertInstanceOf(error, FileSystemError);
+      assertEquals(error.code, "NOT_CAPABLE");
+      assertEquals(error.context, {
+        operation: "createTemporaryDirectory",
+        prefix,
+      });
+      assertInstanceOf(error.cause, Deno.errors.NotCapable);
+    });
+  },
+});

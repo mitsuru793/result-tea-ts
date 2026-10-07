@@ -1,5 +1,10 @@
-import { assertEquals } from "@std/assert";
+import {
+  assertEquals,
+  assertInstanceOf,
+  assertStrictEquals,
+} from "@std/assert";
 import { withFailure, withSuccess } from "@mitsuru793/bythrow-assert";
+import { FileSystemError } from "./errors.ts";
 import {
   append,
   isEmpty,
@@ -40,6 +45,20 @@ fileSystemTest("write() creates or replaces file content", async () => {
     });
     assertEquals(Deno.readTextFileSync(path), "replaced");
   });
+});
+
+Deno.test({
+  name: "write() returns NOT_CAPABLE when write permission is denied",
+  permissions: { write: false },
+  fn: () => {
+    const path = "permission-denied.txt";
+    withFailure(write("content")(path), (error) => {
+      assertInstanceOf(error, FileSystemError);
+      assertEquals(error.code, "NOT_CAPABLE");
+      assertEquals(error.context, { operation: "write", path });
+      assertInstanceOf(error.cause, Deno.errors.NotCapable);
+    });
+  },
 });
 
 fileSystemTest("read() returns file content", async () => {
@@ -89,7 +108,8 @@ fileSystemTest("remove() removes a file", async () => {
       assertEquals(actual, undefined);
     });
     withFailure(read(path), (error) => {
-      assertEquals(error.path, path);
+      assertEquals(error.context, { operation: "read", path });
+      assertEquals(error.code, "NOT_FOUND");
     });
   });
 });
@@ -130,26 +150,83 @@ fileSystemTest(
       const missingPath = `${root}/missing/file.txt`;
 
       withFailure(write("content")(missingPath), (error) => {
-        assertEquals(error.path, missingPath);
+        assertInstanceOf(error, FileSystemError);
+        assertEquals(error.code, "NOT_FOUND");
+        assertEquals(error.context, {
+          operation: "write",
+          path: missingPath,
+        });
+        assertInstanceOf(error.cause, Deno.errors.NotFound);
       });
       withFailure(read(missingPath), (error) => {
-        assertEquals(error.path, missingPath);
+        assertInstanceOf(error, FileSystemError);
+        assertEquals(error.code, "NOT_FOUND");
+        assertEquals(error.context, { operation: "read", path: missingPath });
+        assertInstanceOf(error.cause, Deno.errors.NotFound);
       });
       withFailure(append("content")(missingPath), (error) => {
-        assertEquals(error.path, missingPath);
+        assertInstanceOf(error, FileSystemError);
+        assertEquals(error.code, "NOT_FOUND");
+        assertEquals(error.context, { operation: "append", path: missingPath });
+        assertInstanceOf(error.cause, Deno.errors.NotFound);
       });
       withFailure(prepend("content")(missingPath), (error) => {
-        assertEquals(error.path, missingPath);
+        assertInstanceOf(error, FileSystemError);
+        assertEquals(error.code, "NOT_FOUND");
+        assertEquals(error.context, {
+          operation: "prepend",
+          path: missingPath,
+          phase: "read",
+        });
+        assertInstanceOf(error.cause, Deno.errors.NotFound);
       });
       withFailure(remove(missingPath), (error) => {
-        assertEquals(error.path, missingPath);
+        assertInstanceOf(error, FileSystemError);
+        assertEquals(error.code, "NOT_FOUND");
+        assertEquals(error.context, { operation: "remove", path: missingPath });
+        assertInstanceOf(error.cause, Deno.errors.NotFound);
       });
       withFailure(isEmpty(missingPath), (error) => {
-        assertEquals(error.path, missingPath);
+        assertInstanceOf(error, FileSystemError);
+        assertEquals(error.code, "NOT_FOUND");
+        assertEquals(error.context, { operation: "read", path: missingPath });
+        assertInstanceOf(error.cause, Deno.errors.NotFound);
       });
       withFailure(isFilled(missingPath), (error) => {
-        assertEquals(error.path, missingPath);
+        assertInstanceOf(error, FileSystemError);
+        assertEquals(error.code, "NOT_FOUND");
+        assertEquals(error.context, { operation: "read", path: missingPath });
+        assertInstanceOf(error.cause, Deno.errors.NotFound);
       });
+    });
+  },
+);
+
+fileSystemTest(
+  "prepend() preserves a write-phase failure without changing the content",
+  async () => {
+    await withTempDirectory((root) => {
+      const path = `${root}/file.txt`;
+      Deno.writeTextFileSync(path, "original");
+      const cause = new Deno.errors.PermissionDenied("write denied");
+      const originalWrite = Deno.writeTextFileSync;
+      Deno.writeTextFileSync = () => {
+        throw cause;
+      };
+      try {
+        withFailure(prepend("prefix")(path), (error) => {
+          assertEquals(error.code, "PERMISSION_DENIED");
+          assertEquals(error.context, {
+            operation: "prepend",
+            path,
+            phase: "write",
+          });
+          assertStrictEquals(error.cause, cause);
+        });
+      } finally {
+        Deno.writeTextFileSync = originalWrite;
+      }
+      assertEquals(Deno.readTextFileSync(path), "original");
     });
   },
 );
