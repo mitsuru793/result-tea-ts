@@ -8,7 +8,8 @@
     "jsr:@std/path@^1.1.5": "1.1.6",
     "jsr:@std/path@^1.1.6": "1.1.6",
     "npm:@praha/byethrow@0.12": "0.12.0_typescript@7.0.2",
-    "npm:@praha/error-factory@^1.4.1": "1.4.1"
+    "npm:@praha/error-factory@^1.4.1": "1.4.1",
+    "npm:valibot@^1.5.0": "1.5.0"
   },
   "jsr": {
     "@std/assert@1.0.19": {
@@ -173,6 +174,9 @@
         "@typescript/typescript-win32-x64"
       ],
       "bin": true
+    },
+    "valibot@1.5.0": {
+      "integrity": "sha512-nil6AkP2TChWL43Z5uJ6GTxX01CUA+g8LWUM+N/rB9NBbkUMaUsi9PUNzlUPgoKASgmx9f7eGOYpJ04/fSa6FQ=="
     }
   },
   "workspace": {
@@ -192,7 +196,8 @@
           "jsr:@std/fs@^1.0.24",
           "jsr:@std/path@^1.1.6",
           "npm:@praha/byethrow@0.12",
-          "npm:@praha/error-factory@^1.4.1"
+          "npm:@praha/error-factory@^1.4.1",
+          "npm:valibot@^1.5.0"
         ]
       }
     }
