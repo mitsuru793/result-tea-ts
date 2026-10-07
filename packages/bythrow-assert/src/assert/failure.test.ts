@@ -10,17 +10,33 @@ Deno.test("assertFailure() returns the error from a failure result", () => {
 });
 
 Deno.test("assertFailure() throws for a success result", () => {
+  const successResult = R.succeed("value");
   assertThrows(
-    () => assertFailure(R.succeed("value")),
+    () => assertFailure(successResult),
     AssertionError,
-    "Expected value to be a failure result",
+    `Expected value to be a failure result, but received: "${
+      Deno.inspect(successResult)
+    }"`,
   );
 });
 
-Deno.test("assertFailure() throws for a non-result value", () => {
+Deno.test.each([
+  [null],
+  [undefined],
+  [42],
+  ["string"],
+  [{}],
+  [[]],
+  [Symbol("symbol")],
+  [true],
+  [false],
+])("assertFailure() throws for a non-result value %#", (value) => {
   assertThrows(
-    () => assertFailure(null),
+    // @ts-expect-error: for runtime when the input is not a result
+    () => assertFailure(value),
     AssertionError,
-    "Expected value to be a failure result",
+    `Expected value to be a failure result, but received: "${
+      Deno.inspect(value)
+    }"`,
   );
 });
