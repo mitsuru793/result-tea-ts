@@ -60,7 +60,7 @@ const listItems = (client: DriveClient.Type): ListItems => async (id) => {
   return R.collect(parsed);
 };
 
-export const create = (client: DriveClient.Type): {
+export const bind = (client: DriveClient.Type): {
   getById: GetById;
   listItems: ListItems;
 } => ({

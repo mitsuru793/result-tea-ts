@@ -21,6 +21,6 @@ const getFileBody = (client: DriveClient.Type): GetMedia => async (itemId) => {
   )
 };
 
-export const create = (client: DriveClient.Type): { getMedia: GetMedia } => ({
+export const bind = (client: DriveClient.Type): { getMedia: GetMedia } => ({
   getMedia: getFileBody(client),
 });

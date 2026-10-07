@@ -13,8 +13,8 @@ function main(): void {
     }),
     R.andThen(DriveClient.create),
     R.andThrough((client) => {
-      const folderReader = FolderReader.create(client);
-      const itemReader = ItemReader.create(client);
+      const folderReader = FolderReader.bind(client);
+      const itemReader = ItemReader.bind(client);
 
       R.pipe(
         folderReader.getById(folderId),

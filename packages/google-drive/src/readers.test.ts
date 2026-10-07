@@ -56,7 +56,7 @@ Deno.test("getById returns validated folder metadata", async () => {
     );
     return json(metadata);
   });
-  const result = await FolderReader.create(mockClient).getById("item_1");
+  const result = await FolderReader.bind(mockClient).getById("item_1");
   assert(result.type === "Success");
   assertEquals(result.value.id, metadata.id);
   assertEquals(result.value.createdTime, new Date(metadata.createdTime));
@@ -64,7 +64,7 @@ Deno.test("getById returns validated folder metadata", async () => {
 });
 
 Deno.test("getById rejects non-folder metadata", async () => {
-  const result = await FolderReader.create(
+  const result = await FolderReader.bind(
     client(() => json({ ...metadata, mimeType: "text/plain" })),
   ).getById("item_1");
   assert(result.type === "Failure");
@@ -73,7 +73,7 @@ Deno.test("getById rejects non-folder metadata", async () => {
 });
 
 Deno.test("getById preserves metadata validation failures", async () => {
-  const result = await FolderReader.create(
+  const result = await FolderReader.bind(
     client(() => json({ ...metadata, createdTime: "invalid" })),
   ).getById("item_1");
   assert(result.type === "Failure");
@@ -84,16 +84,16 @@ const operations = [
   {
     name: "getById",
     run: (drive: drive_v3.Drive) =>
-      FolderReader.create(drive).getById("item_1"),
+      FolderReader.bind(drive).getById("item_1"),
   },
   {
     name: "listItems",
     run: (drive: drive_v3.Drive) =>
-      FolderReader.create(drive).listItems("item_1"),
+      FolderReader.bind(drive).listItems("item_1"),
   },
   {
     name: "getMedia",
-    run: (drive: drive_v3.Drive) => ItemReader.create(drive).getMedia("item_1"),
+    run: (drive: drive_v3.Drive) => ItemReader.bind(drive).getMedia("item_1"),
   },
 ];
 
@@ -152,21 +152,21 @@ Deno.test("listItems follows tokens even when an intermediate page is empty", as
       files: [{ ...metadata, id: "item_2", mimeType: "text/plain" }],
     });
   });
-  const result = await FolderReader.create(mockClient).listItems("folder_1");
+  const result = await FolderReader.bind(mockClient).listItems("folder_1");
   assert(result.type === "Success");
   assertEquals(result.value.map((item) => item.id), ["item_1", "item_2"]);
   assertEquals(tokens, [null, "second", "third"]);
 });
 
 Deno.test("listItems returns an empty list when files are omitted", async () => {
-  const result = await FolderReader.create(client(() => json({}))).listItems(
+  const result = await FolderReader.bind(client(() => json({}))).listItems(
     "folder_1",
   );
   assertEquals(result, { type: "Success", value: [] });
 });
 
 Deno.test("listItems aggregates parse failures across pages", async () => {
-  const result = await FolderReader.create(
+  const result = await FolderReader.bind(
     client((url) =>
       url.searchParams.has("pageToken")
         ? json({ files: [{ ...metadata, modifiedTime: "invalid" }] })
@@ -185,7 +185,7 @@ Deno.test("listItems aggregates parse failures across pages", async () => {
 });
 
 Deno.test("listItems does not return partial success when a later page fails", async () => {
-  const result = await FolderReader.create(
+  const result = await FolderReader.bind(
     client((url) =>
       url.searchParams.has("pageToken")
         ? json({ error: { message: "Mock forbidden" } }, 403)
@@ -205,7 +205,7 @@ for (
   ]
 ) {
   Deno.test(`getMedia preserves ${contentType} text ${JSON.stringify(text)}`, async () => {
-    const result = await ItemReader.create(client((url) => {
+    const result = await ItemReader.bind(client((url) => {
       assertEquals(url.searchParams.get("alt"), "media");
       return new Response(text, { headers: { "Content-Type": contentType } });
     })).getMedia("item_1");
