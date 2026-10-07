@@ -26,11 +26,11 @@ export function classifyCause(cause: unknown): FileSystemErrorCode {
 export type FileSystemErrorContext =
   | {
     readonly operation:
-      | "read"
-      | "write"
-      | "remove"
-      | "append"
-      | "ensure"
+      | "readFile"
+      | "writeFile"
+      | "removeFile"
+      | "appendFile"
+      | "ensureFile"
       | "createDirectory"
       | "ensureDirectory"
       | "removeDirectory"

@@ -185,7 +185,7 @@ fileSystemTest(
       withFailure(writeFile("content")(missingPath), (error) => {
         assertInstanceOf(error, FileSystemError);
         assertEquals(error.code, "NOT_FOUND");
-        assertEquals(error.context, { operation: "write", path: missingPath });
+        assertEquals(error.context, { operation: "writeFile", path: missingPath });
         assertInstanceOf(error.cause, Deno.errors.NotFound);
       });
       withFailure(removeForce(missingPath), (error) => {

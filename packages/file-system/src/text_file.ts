@@ -11,7 +11,7 @@ export const write: Write = (content) => (path) => {
     return R.succeed(undefined);
   } catch (error) {
     return R.fail(
-      FileSystemError.fromCause({ operation: "write", path }, error),
+      FileSystemError.fromCause({ operation: "writeFile", path }, error),
     );
   }
 };
@@ -24,7 +24,7 @@ export const read: Read = (path) => {
     return R.succeed(content);
   } catch (error) {
     return R.fail(
-      FileSystemError.fromCause({ operation: "read", path }, error),
+      FileSystemError.fromCause({ operation: "readFile", path }, error),
     );
   }
 };
@@ -38,7 +38,7 @@ export const ensure: Ensure = (path) => {
     return R.succeed(undefined);
   } catch (error) {
     return R.fail(
-      FileSystemError.fromCause({ operation: "ensure", path }, error),
+      FileSystemError.fromCause({ operation: "ensureFile", path }, error),
     );
   }
 };
@@ -53,7 +53,7 @@ export const append: Append = (content) => (path) => {
     return R.succeed(undefined);
   } catch (error) {
     return R.fail(
-      FileSystemError.fromCause({ operation: "append", path }, error),
+      FileSystemError.fromCause({ operation: "appendFile", path }, error),
     );
   }
 };
@@ -84,7 +84,7 @@ export const remove: Remove = (path) => {
     return R.succeed(undefined);
   } catch (error) {
     return R.fail(
-      FileSystemError.fromCause({ operation: "remove", path }, error),
+      FileSystemError.fromCause({ operation: "removeFile", path }, error),
     );
   }
 };
@@ -97,7 +97,7 @@ export const isEmpty: IsEmpty = (path) => {
     return R.succeed(content.length === 0);
   } catch (error) {
     return R.fail(
-      FileSystemError.fromCause({ operation: "read", path }, error),
+      FileSystemError.fromCause({ operation: "readFile", path }, error),
     );
   }
 };
@@ -110,7 +110,7 @@ export const isFilled: IsFilled = (path) => {
     return R.succeed(content.length > 0);
   } catch (error) {
     return R.fail(
-      FileSystemError.fromCause({ operation: "read", path }, error),
+      FileSystemError.fromCause({ operation: "readFile", path }, error),
     );
   }
 };

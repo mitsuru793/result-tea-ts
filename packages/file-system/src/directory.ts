@@ -58,7 +58,10 @@ export const writeFile: WriteFile = (content) => (childPath) => {
     return R.succeed(undefined);
   } catch (error) {
     return R.fail(
-      FileSystemError.fromCause({ operation: "write", path: childPath }, error),
+      FileSystemError.fromCause(
+        { operation: "writeFile", path: childPath },
+        error,
+      ),
     );
   }
 };

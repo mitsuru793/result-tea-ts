@@ -56,7 +56,7 @@ Deno.test({
     withFailure(write("content")(path), (error) => {
       assertInstanceOf(error, FileSystemError);
       assertEquals(error.code, "NOT_CAPABLE");
-      assertEquals(error.context, { operation: "write", path });
+      assertEquals(error.context, { operation: "writeFile", path });
       assertInstanceOf(error.cause, Deno.errors.NotCapable);
     });
   },
@@ -130,7 +130,7 @@ fileSystemTest("remove() removes a file", async () => {
       assertEquals(actual, undefined);
     });
     withFailure(read(path), (error) => {
-      assertEquals(error.context, { operation: "read", path });
+      assertEquals(error.context, { operation: "readFile", path });
       assertEquals(error.code, "NOT_FOUND");
     });
   });
@@ -175,7 +175,7 @@ fileSystemTest(
         assertInstanceOf(error, FileSystemError);
         assertEquals(error.code, "NOT_FOUND");
         assertEquals(error.context, {
-          operation: "write",
+          operation: "writeFile",
           path: missingPath,
         });
         assertInstanceOf(error.cause, Deno.errors.NotFound);
@@ -183,19 +183,19 @@ fileSystemTest(
       withFailure(read(missingPath), (error) => {
         assertInstanceOf(error, FileSystemError);
         assertEquals(error.code, "NOT_FOUND");
-        assertEquals(error.context, { operation: "read", path: missingPath });
+        assertEquals(error.context, { operation: "readFile", path: missingPath });
         assertInstanceOf(error.cause, Deno.errors.NotFound);
       });
       withFailure(ensure(missingPath), (error) => {
         assertInstanceOf(error, FileSystemError);
         assertEquals(error.code, "NOT_FOUND");
-        assertEquals(error.context, { operation: "ensure", path: missingPath });
+        assertEquals(error.context, { operation: "ensureFile", path: missingPath });
         assertInstanceOf(error.cause, Deno.errors.NotFound);
       });
       withFailure(append("content")(missingPath), (error) => {
         assertInstanceOf(error, FileSystemError);
         assertEquals(error.code, "NOT_FOUND");
-        assertEquals(error.context, { operation: "append", path: missingPath });
+        assertEquals(error.context, { operation: "appendFile", path: missingPath });
         assertInstanceOf(error.cause, Deno.errors.NotFound);
       });
       withFailure(prepend("content")(missingPath), (error) => {
@@ -211,19 +211,19 @@ fileSystemTest(
       withFailure(remove(missingPath), (error) => {
         assertInstanceOf(error, FileSystemError);
         assertEquals(error.code, "NOT_FOUND");
-        assertEquals(error.context, { operation: "remove", path: missingPath });
+        assertEquals(error.context, { operation: "removeFile", path: missingPath });
         assertInstanceOf(error.cause, Deno.errors.NotFound);
       });
       withFailure(isEmpty(missingPath), (error) => {
         assertInstanceOf(error, FileSystemError);
         assertEquals(error.code, "NOT_FOUND");
-        assertEquals(error.context, { operation: "read", path: missingPath });
+        assertEquals(error.context, { operation: "readFile", path: missingPath });
         assertInstanceOf(error.cause, Deno.errors.NotFound);
       });
       withFailure(isFilled(missingPath), (error) => {
         assertInstanceOf(error, FileSystemError);
         assertEquals(error.code, "NOT_FOUND");
-        assertEquals(error.context, { operation: "read", path: missingPath });
+        assertEquals(error.context, { operation: "readFile", path: missingPath });
         assertInstanceOf(error.cause, Deno.errors.NotFound);
       });
     });

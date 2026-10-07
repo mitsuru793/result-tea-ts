@@ -23,7 +23,7 @@ for (const [code, causes] of Object.entries(cases)) {
   Deno.test(`classifyCause() returns ${code}`, () => {
     for (const cause of causes) {
       assertEquals(classifyCause(cause), code);
-      const context = { operation: "read", path: "file.txt" } as const;
+      const context = { operation: "readFile", path: "file.txt" } as const;
       const error = FileSystemError.fromCause(context, cause);
       assertInstanceOf(error, FileSystemError);
       assertEquals(error.code, code);
@@ -39,7 +39,7 @@ Deno.test("the public entry point exports the FileSystemError class", () => {
 
 Deno.test("FileSystemError.fromCause preserves every context shape and unknown causes", () => {
   const contexts = [
-    { operation: "read", path: "file.txt" },
+    { operation: "readFile", path: "file.txt" },
     { operation: "prepend", path: "file.txt", phase: "read" },
     { operation: "createTemporaryDirectory", prefix: "test-" },
     { operation: "glob", pattern: "*.txt" },
@@ -59,7 +59,7 @@ Deno.test("FileSystemError.fromCause preserves every context shape and unknown c
 
 Deno.test("FileSystemError preserves the code, context, and original cause", () => {
   const cause = new Deno.errors.NotFound("missing");
-  const context = { operation: "write", path: "missing/file.txt" } as const;
+  const context = { operation: "writeFile", path: "missing/file.txt" } as const;
   const error = new FileSystemError({
     code: classifyCause(cause),
     context,
@@ -70,7 +70,7 @@ Deno.test("FileSystemError preserves the code, context, and original cause", () 
   assertEquals(error.name, "FileSystemError");
   assertEquals(
     error.message,
-    "File system operation failed: write (NOT_FOUND)",
+    "File system operation failed: writeFile (NOT_FOUND)",
   );
   assertEquals(error.code, "NOT_FOUND");
   assertEquals(error.context, context);
