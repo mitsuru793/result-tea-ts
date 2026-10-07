@@ -31,7 +31,7 @@ const getById = (client: DriveClient.Type): GetById => async (id) => {
 
       return Folder.parse(data);
     }),
-  )
+  );
 };
 
 export type ListItems = (

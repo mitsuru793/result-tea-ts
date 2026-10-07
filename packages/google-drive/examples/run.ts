@@ -1,7 +1,14 @@
 import { R } from "@praha/byethrow";
-import { Credential, DriveClient, FolderReader, ItemReader } from "@result-tea/google-drive";
+import {
+  Credential,
+  DriveClient,
+  FolderReader,
+  ItemReader,
+} from "@result-tea/google-drive";
 
-import credentials from "./google-service-account-credentials.json" with { type: "json" };
+import credentials from "./google-service-account-credentials.json" with {
+  type: "json",
+};
 
 function main(): void {
   const folderId = Deno.args[0];
@@ -20,7 +27,7 @@ function main(): void {
         folderReader.getById(folderId),
         R.andThen((folder) => {
           console.log({ folder });
-          return folderReader.listItems(folder.id)
+          return folderReader.listItems(folder.id);
         }),
         R.andThen((items) => {
           console.log({ items });
@@ -29,12 +36,12 @@ function main(): void {
         R.andThrough((item) => {
           console.log({ item });
           return R.succeed(item);
-        })
-      )
+        }),
+      );
 
       return R.succeed(client);
-    })
-  )
+    }),
+  );
 }
 
 main();

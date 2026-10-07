@@ -17,8 +17,8 @@ const getFileBody = (client: DriveClient.Type): GetMedia => async (itemId) => {
         alt: "media",
       }, { responseType: "text" })
     ),
-    R.andThen((data) => FileBody.parse(data))
-  )
+    R.andThen((data) => FileBody.parse(data)),
+  );
 };
 
 export const bind = (client: DriveClient.Type): { getMedia: GetMedia } => ({

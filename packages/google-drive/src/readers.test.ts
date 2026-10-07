@@ -83,8 +83,7 @@ Deno.test("getById preserves metadata validation failures", async () => {
 const operations = [
   {
     name: "getById",
-    run: (drive: drive_v3.Drive) =>
-      FolderReader.bind(drive).getById("item_1"),
+    run: (drive: drive_v3.Drive) => FolderReader.bind(drive).getById("item_1"),
   },
   {
     name: "listItems",
