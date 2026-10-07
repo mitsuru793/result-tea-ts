@@ -4,7 +4,7 @@ import {
   assertStrictEquals,
 } from "@std/assert";
 import { withFailure, withSuccess } from "@result-tea/bythrow-assert";
-import { CsvError, parse, stringify } from "./mod.ts";
+import { CsvError, CsvText, parse, stringify } from "./mod.ts";
 
 Deno.test("parse() without options returns rows of strings", () => {
   withSuccess(parse("a,b\n1,2\n"), (rows) => {
@@ -52,6 +52,14 @@ Deno.test("stringify() serializes an array of objects using the given columns", 
   const data = [{ a: "1", b: "2" }];
   withSuccess(stringify(data, { columns: ["a", "b"] }), (text) => {
     assertEquals(text, "a,b\r\n1,2\r\n");
+  });
+});
+
+Deno.test("stringify()'s output round-trips as valid CsvText", () => {
+  withSuccess(stringify([["a", "b"], ["1", "2"]]), (text) => {
+    withSuccess(CsvText.from(text), (csvText) => {
+      assertStrictEquals(csvText, text);
+    });
   });
 });
 

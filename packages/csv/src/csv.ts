@@ -8,6 +8,7 @@ import {
   type StringifyOptions,
 } from "@std/csv";
 import { CsvError } from "./csv_error.ts";
+import type * as CsvText from "./csv_text.ts";
 
 export type Parse = {
   (text: string): R.Result<string[][], CsvError>;
@@ -35,13 +36,14 @@ export const parse: Parse = ((text: string, options?: ParseOptions) => {
 export type Stringify = (
   data: readonly DataItem[],
   options?: StringifyOptions,
-) => R.Result<string, CsvError>;
+) => R.Result<CsvText.Type, CsvError>;
 
 /** Serializes rows (plain objects or arrays) into a CSV string. */
 export const stringify: Stringify = (data, options) => {
   try {
     const text = stringifyCsv(data, options);
-    return R.succeed(text);
+    // stringifyCsv's output is valid CSV text by construction; skip re-validation.
+    return R.succeed(text as CsvText.Type);
   } catch (cause) {
     return R.fail(CsvError.fromCause("stringify", cause));
   }
