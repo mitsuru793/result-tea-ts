@@ -2,13 +2,19 @@ import { ErrorFactory } from "@praha/error-factory";
 
 export type CsvOperation = "parse" | "stringify";
 
-export class CsvError extends ErrorFactory({
+type CsvErrorFields = {
+  operation: CsvOperation;
+};
+
+const CsvErrorBase: ReturnType<
+  typeof ErrorFactory<"CsvError", string, CsvErrorFields>
+> = ErrorFactory({
   name: "CsvError",
   message: ({ operation }) => `CSV operation failed: ${operation}`,
-  fields: ErrorFactory.fields<{
-    operation: CsvOperation;
-  }>(),
-}) {
+  fields: ErrorFactory.fields<CsvErrorFields>(),
+});
+
+export class CsvError extends CsvErrorBase {
   static fromCause(operation: CsvOperation, cause: unknown): CsvError {
     return new CsvError({ operation, cause });
   }
