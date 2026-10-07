@@ -1,10 +1,9 @@
 import { R } from "@praha/byethrow";
 import { AssertionError } from "@std/assert";
 
-export function assertIsSuccess(
+export function assertSuccess(
   actual: unknown,
-  callback?: (value: unknown) => void,
-): asserts actual is R.Success<unknown> {
+): unknown {
   if (!(R.isResult(actual) && R.isSuccess(actual))) {
     throw new AssertionError(
       `Expected value to be a success result, but received:\n ${
@@ -13,7 +12,5 @@ export function assertIsSuccess(
     );
   }
 
-  if (callback) {
-    callback(actual.value);
-  }
+  return actual.value;
 }

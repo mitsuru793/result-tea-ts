@@ -1,2 +1,2 @@
-export * from "./is_failure.ts";
-export * from "./is_success.ts";
+export * from "./failure.ts";
+export * from "./success.ts";
