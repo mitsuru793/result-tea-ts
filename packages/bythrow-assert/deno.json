@@ -1,5 +1,5 @@
 {
-  "name": "@mitsuru793/bythrow-testing-helper",
+  "name": "@mitsuru793/bythrow-assert",
   "version": "0.0.0",
   "exports": {
     ".": "./mod.ts"

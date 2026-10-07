@@ -177,7 +177,7 @@
   },
   "workspace": {
     "members": {
-      "packages/file-system": {
+      "packages/bythrow-assert": {
         "dependencies": [
           "jsr:@std/assert@1",
           "jsr:@std/fs@^1.0.24",
@@ -186,7 +186,7 @@
           "npm:@praha/error-factory@^1.4.1"
         ]
       },
-      "packages/testing-helper": {
+      "packages/file-system": {
         "dependencies": [
           "jsr:@std/assert@1",
           "jsr:@std/fs@^1.0.24",
