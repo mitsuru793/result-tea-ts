@@ -4,7 +4,7 @@ import {
   assertStrictEquals,
 } from "@std/assert";
 import { withFailure, withSuccess } from "@result-tea/bythrow-assert";
-import { JsonError, parse, stringify } from "./mod.ts";
+import { JsonError, JsonText, parse, stringify } from "./mod.ts";
 
 Deno.test("parse() returns the parsed JSON value", () => {
   withSuccess(parse('{"answer":42}'), (value) => {
@@ -24,6 +24,14 @@ Deno.test("parse() returns a JsonError and preserves the cause for invalid JSON"
 Deno.test("stringify() returns serialized JSON", () => {
   withSuccess(stringify({ answer: 42 }), (text) => {
     assertEquals(text, '{"answer":42}');
+  });
+});
+
+Deno.test("stringify()'s output round-trips as valid JsonText", () => {
+  withSuccess(stringify({ answer: 42 }), (text) => {
+    withSuccess(JsonText.from(text), (jsonText) => {
+      assertStrictEquals(jsonText, text);
+    });
   });
 });
 
