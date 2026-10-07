@@ -7,7 +7,7 @@ import {
   read,
   remove,
   write,
-} from "./text-file.ts";
+} from "./text_file.ts";
 
 function fileSystemTest(
   name: string,
