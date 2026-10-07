@@ -1,11 +1,12 @@
 import type { R } from "@praha/byethrow";
 import * as v from "valibot";
 import { createParse, type ParseFailure } from "@result-tea/valibot";
+import * as FileSystemPath from "./file_system_path.ts";
 
 /** Text to write at a path, regardless of extension or file existence. */
 export const schema = v.pipe(
   v.object({
-    path: v.pipe(v.string(), v.minLength(1)),
+    path: FileSystemPath.schema,
     content: v.string(),
   }),
   v.readonly(),
