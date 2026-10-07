@@ -7,6 +7,7 @@ import { withFailure, withSuccess } from "@result-tea/bythrow-assert";
 import * as v from "valibot";
 import {
   createParse,
+  Model,
   ParseError,
   type ParseFailure,
   ValidationExecutionError,
@@ -84,4 +85,112 @@ Deno.test("createParse() preserves a Promise-valued output in a synchronous Resu
     assertStrictEquals(output, value);
   });
   assertEquals(await value, "body");
+});
+
+Deno.test("Model.define() exposes the original schema", () => {
+  const schema = v.string();
+  assertStrictEquals(Model.define(schema).schema, schema);
+});
+
+Deno.test.each([
+  { method: "create" as const },
+  { method: "parse" as const },
+])("Model.define().$method() returns transformed output", ({ method }) => {
+  const model = Model.define(v.pipe(v.string(), v.transform(Number)));
+  withSuccess(model[method]("42"), (value) => {
+    assertEquals(value, 42);
+  });
+});
+
+Deno.test.each([
+  { method: "create" as const },
+  { method: "parse" as const },
+])("Model.define().$method() validates runtime constraints", ({ method }) => {
+  const schema = v.pipe(v.string(), v.minLength(1));
+  const model = Model.define(schema);
+  const expected = v.safeParse(schema, "");
+  withFailure(model[method](""), (error) => {
+    assertInstanceOf(error, ParseError);
+    assertEquals(error.issues, expected.issues);
+  });
+});
+
+Deno.test("Model.define().parse() validates unknown input", () => {
+  const model = Model.define(v.string());
+  const input: unknown = 42;
+  withFailure(model.parse(input), (error) => {
+    assertInstanceOf(error, ParseError);
+  });
+});
+
+Deno.test.each([
+  { method: "create" as const },
+  { method: "parse" as const },
+])("Model.define().$method() preserves execution failures", ({ method }) => {
+  const cause = new TypeError("transform failed");
+  const model = Model.define(v.pipe(
+    v.string(),
+    v.transform(() => {
+      throw cause;
+    }),
+  ));
+  withFailure(model[method]("input"), (error) => {
+    assertInstanceOf(error, ValidationExecutionError);
+    assertStrictEquals(error.cause, cause);
+  });
+});
+
+Deno.test.each([
+  { method: "create" as const },
+  { method: "parse" as const },
+])(
+  "Model.define().$method() preserves Promise-valued output synchronously",
+  async ({ method }) => {
+    const value = Promise.resolve("body");
+    const model = Model.define(
+      v.pipe(v.string(), v.transform(() => value)),
+    );
+    withSuccess(model[method]("input"), (output) => {
+      assertStrictEquals(output, value);
+    });
+    assertEquals(await value, "body");
+  },
+);
+
+Deno.test("Model.define() preserves defaults, readonly fields, and brands", () => {
+  const schema = v.pipe(
+    v.object({ name: v.optional(v.string(), "tea") }),
+    v.readonly(),
+    v.brand("Tea"),
+  );
+  const model = Model.define(schema);
+  withSuccess(model.create({}), (value) => {
+    const output: v.InferOutput<typeof schema> = value;
+    assertEquals<v.InferInput<typeof schema>>(output, { name: "tea" });
+    const checkReadonly = () => {
+      // @ts-expect-error Schema output fields are readonly.
+      value.name = "coffee";
+    };
+    void checkReadonly;
+  });
+});
+
+Deno.test("Model.define() distinguishes constructor input from parser input", () => {
+  const schema = v.pipe(v.string(), v.transform(Number), v.brand("Count"));
+  const model = Model.define(schema);
+  const checkInput = (input: unknown) => {
+    model.parse(input);
+    // @ts-expect-error The constructor requires the schema input type.
+    model.create(input);
+    // @ts-expect-error Transformed output is not the schema input type.
+    model.create(42);
+    // @ts-expect-error Unvalidated numbers do not carry the output brand.
+    const output: v.InferOutput<typeof schema> = 42;
+    void output;
+  };
+  void checkInput;
+  withSuccess(model.create("42"), (value) => {
+    const output: v.InferOutput<typeof schema> = value;
+    assertEquals<number>(output, 42);
+  });
 });
