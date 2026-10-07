@@ -1,4 +1,5 @@
 import { assertEquals } from "@std/assert";
+import { withFailure, withSuccess } from "@mitsuru793/bythrow-assert";
 import {
   append,
   isEmpty,
@@ -31,10 +32,11 @@ fileSystemTest("write() creates or replaces file content", async () => {
   await withTempDir((root) => {
     const path = `${root}/file.txt`;
 
-    assertEquals(write("initial")(path), { type: "Success", value: undefined });
-    assertEquals(write("replaced")(path), {
-      type: "Success",
-      value: undefined,
+    withSuccess(write("initial")(path), (actual) => {
+      assertEquals(actual, undefined);
+    });
+    withSuccess(write("replaced")(path), (actual) => {
+      assertEquals(actual, undefined);
     });
     assertEquals(Deno.readTextFileSync(path), "replaced");
   });
@@ -45,7 +47,9 @@ fileSystemTest("read() returns file content", async () => {
     const path = `${root}/file.txt`;
     Deno.writeTextFileSync(path, "content");
 
-    assertEquals(read(path), { type: "Success", value: "content" });
+    withSuccess(read(path), (actual) => {
+      assertEquals(actual, "content");
+    });
   });
 });
 
@@ -54,9 +58,8 @@ fileSystemTest("append() adds content to the end of a file", async () => {
     const path = `${root}/file.txt`;
     Deno.writeTextFileSync(path, "first");
 
-    assertEquals(append(" second")(path), {
-      type: "Success",
-      value: undefined,
+    withSuccess(append(" second")(path), (actual) => {
+      assertEquals(actual, undefined);
     });
     assertEquals(Deno.readTextFileSync(path), "first second");
   });
@@ -69,9 +72,8 @@ fileSystemTest(
       const path = `${root}/file.txt`;
       Deno.writeTextFileSync(path, "last");
 
-      assertEquals(prepend("first ")(path), {
-        type: "Success",
-        value: undefined,
+      withSuccess(prepend("first ")(path), (actual) => {
+        assertEquals(actual, undefined);
       });
       assertEquals(Deno.readTextFileSync(path), "first last");
     });
@@ -83,8 +85,12 @@ fileSystemTest("remove() removes a file", async () => {
     const path = `${root}/file.txt`;
     Deno.writeTextFileSync(path, "content");
 
-    assertEquals(remove(path), { type: "Success", value: undefined });
-    assertEquals(read(path).type, "Failure");
+    withSuccess(remove(path), (actual) => {
+      assertEquals(actual, undefined);
+    });
+    withFailure(read(path), (error) => {
+      assertEquals(error.path, path);
+    });
   });
 });
 
@@ -93,13 +99,11 @@ fileSystemTest("isEmpty() returns true for empty files", async () => {
     Deno.writeTextFileSync(`${root}/empty.txt`, "");
     Deno.writeTextFileSync(`${root}/filled.txt`, "content");
 
-    assertEquals(isEmpty(`${root}/empty.txt`), {
-      type: "Success",
-      value: true,
+    withSuccess(isEmpty(`${root}/empty.txt`), (actual) => {
+      assertEquals(actual, true);
     });
-    assertEquals(isEmpty(`${root}/filled.txt`), {
-      type: "Success",
-      value: false,
+    withSuccess(isEmpty(`${root}/filled.txt`), (actual) => {
+      assertEquals(actual, false);
     });
   });
 });
@@ -109,13 +113,11 @@ fileSystemTest("isFilled() returns true for non-empty files", async () => {
     Deno.writeTextFileSync(`${root}/empty.txt`, "");
     Deno.writeTextFileSync(`${root}/filled.txt`, "content");
 
-    assertEquals(isFilled(`${root}/empty.txt`), {
-      type: "Success",
-      value: false,
+    withSuccess(isFilled(`${root}/empty.txt`), (actual) => {
+      assertEquals(actual, false);
     });
-    assertEquals(isFilled(`${root}/filled.txt`), {
-      type: "Success",
-      value: true,
+    withSuccess(isFilled(`${root}/filled.txt`), (actual) => {
+      assertEquals(actual, true);
     });
   });
 });
@@ -127,13 +129,27 @@ fileSystemTest(
     await withTempDir((root) => {
       const missingPath = `${root}/missing/file.txt`;
 
-      assertEquals(write("content")(missingPath).type, "Failure");
-      assertEquals(read(missingPath).type, "Failure");
-      assertEquals(append("content")(missingPath).type, "Failure");
-      assertEquals(prepend("content")(missingPath).type, "Failure");
-      assertEquals(remove(missingPath).type, "Failure");
-      assertEquals(isEmpty(missingPath).type, "Failure");
-      assertEquals(isFilled(missingPath).type, "Failure");
+      withFailure(write("content")(missingPath), (error) => {
+        assertEquals(error.path, missingPath);
+      });
+      withFailure(read(missingPath), (error) => {
+        assertEquals(error.path, missingPath);
+      });
+      withFailure(append("content")(missingPath), (error) => {
+        assertEquals(error.path, missingPath);
+      });
+      withFailure(prepend("content")(missingPath), (error) => {
+        assertEquals(error.path, missingPath);
+      });
+      withFailure(remove(missingPath), (error) => {
+        assertEquals(error.path, missingPath);
+      });
+      withFailure(isEmpty(missingPath), (error) => {
+        assertEquals(error.path, missingPath);
+      });
+      withFailure(isFilled(missingPath), (error) => {
+        assertEquals(error.path, missingPath);
+      });
     });
   },
 );

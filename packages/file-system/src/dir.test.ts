@@ -1,4 +1,6 @@
 import { assertEquals, assertThrows } from "@std/assert";
+import { withSuccess } from "@mitsuru793/bythrow-assert";
+
 import {
   create,
   createTmp,
@@ -32,7 +34,9 @@ fileSystemTest("create() creates nested directories", async () => {
   await withTempDir((root) => {
     const path = `${root}/one/two`;
 
-    assertEquals(create(path), { type: "Success", value: undefined });
+    withSuccess(create(path), (actual) => {
+      assertEquals(actual, undefined);
+    });
     assertEquals(Deno.statSync(path).isDirectory, true);
   });
 });
@@ -44,12 +48,13 @@ fileSystemTest(
     if (result.type === "Failure") throw result.error;
 
     try {
-      assertEquals(result.type, "Success");
-      assertEquals(
-        result.value.split("/").at(-1)?.startsWith("file-system-test-"),
-        true,
-      );
-      assertEquals(Deno.statSync(result.value).isDirectory, true);
+      withSuccess(result, (actual) => {
+        assertEquals(
+          actual.split("/").at(-1)?.startsWith("file-system-test-"),
+          true,
+        );
+        assertEquals(Deno.statSync(actual).isDirectory, true);
+      });
     } finally {
       Deno.removeSync(result.value, { recursive: true });
     }
@@ -60,11 +65,15 @@ fileSystemTest("ensure() creates a directory that does not exist", async () => {
   await withTempDir((root) => {
     const path = `${root}/created`;
 
-    assertEquals(ensure(path), { type: "Success", value: undefined });
+    withSuccess(ensure(path), (actual) => {
+      assertEquals(actual, undefined);
+    });
     assertEquals(Deno.statSync(path).isDirectory, true);
 
     // Ensure the directory still exists when calling ensure() again
-    assertEquals(ensure(path), { type: "Success", value: undefined });
+    withSuccess(ensure(path), (actualAgain) => {
+      assertEquals(actualAgain, undefined);
+    });
     assertEquals(Deno.statSync(path).isDirectory, true);
   });
 });
@@ -73,9 +82,8 @@ fileSystemTest("writeFile() writes content to a file", async () => {
   await withTempDir((root) => {
     const path = `${root}/file.txt`;
 
-    assertEquals(writeFile("content")(path), {
-      type: "Success",
-      value: undefined,
+    withSuccess(writeFile("content")(path), (actual) => {
+      assertEquals(actual, undefined);
     });
     assertEquals(Deno.readTextFileSync(path), "content");
   });
@@ -108,7 +116,9 @@ fileSystemTest(
       Deno.mkdirSync(`${path}/nested`, { recursive: true });
       Deno.writeTextFileSync(`${path}/nested/file.txt`, "content");
 
-      assertEquals(removeForce(path), { type: "Success", value: undefined });
+      withSuccess(removeForce(path), (actual) => {
+        assertEquals(actual, undefined);
+      });
       assertThrows(() => Deno.statSync(path));
     });
   },
@@ -120,8 +130,12 @@ fileSystemTest("isEmpty() returns true for empty directories", async () => {
     Deno.mkdirSync(`${root}/filled`);
     Deno.writeTextFileSync(`${root}/filled/file.txt`, "content");
 
-    assertEquals(isEmpty(`${root}/empty`), { type: "Success", value: true });
-    assertEquals(isEmpty(`${root}/filled`), { type: "Success", value: false });
+    withSuccess(isEmpty(`${root}/empty`), (actual) => {
+      assertEquals(actual, true);
+    });
+    withSuccess(isEmpty(`${root}/filled`), (actualFilled) => {
+      assertEquals(actualFilled, false);
+    });
   });
 });
 
@@ -133,13 +147,11 @@ fileSystemTest(
       Deno.mkdirSync(`${root}/filled`);
       Deno.writeTextFileSync(`${root}/filled/file.txt`, "content");
 
-      assertEquals(isFilled(`${root}/empty`), {
-        type: "Success",
-        value: false,
+      withSuccess(isFilled(`${root}/empty`), (actualEmpty) => {
+        assertEquals(actualEmpty, false);
       });
-      assertEquals(isFilled(`${root}/filled`), {
-        type: "Success",
-        value: true,
+      withSuccess(isFilled(`${root}/filled`), (actualFilled) => {
+        assertEquals(actualFilled, true);
       });
     });
   },

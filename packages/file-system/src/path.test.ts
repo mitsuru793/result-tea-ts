@@ -1,4 +1,5 @@
 import { assertEquals } from "@std/assert";
+import { withSuccess } from "@mitsuru793/bythrow-assert";
 import {
   allExtensions,
   baseName,
@@ -9,63 +10,52 @@ import {
 } from "./path.ts";
 
 Deno.test("parentDir() returns the parent directory", () => {
-  assertEquals(parentDir("src/path.ts"), {
-    type: "Success",
-    value: "src",
+  withSuccess(parentDir("src/path.ts"), (actual) => {
+    assertEquals(actual, "src");
   });
-  assertEquals(parentDir("src/dir1/dir2/"), {
-    type: "Success",
-    value: "src/dir1",
+  withSuccess(parentDir("src/dir1/dir2/"), (actual) => {
+    assertEquals(actual, "src/dir1");
   });
 });
 
 Deno.test("lastExtension() returns the text after the final dot", () => {
-  assertEquals(lastExtension("/tmp/archive.tar.gz"), {
-    type: "Success",
-    value: "gz",
+  withSuccess(lastExtension("/tmp/archive.tar.gz"), (actual) => {
+    assertEquals(actual, "gz");
   });
-  assertEquals(lastExtension("README"), {
-    type: "Success",
-    value: "",
+  withSuccess(lastExtension("README"), (actual) => {
+    assertEquals(actual, "");
   });
 });
 
 Deno.test("allExtensions() returns all text after each dot", () => {
-  assertEquals(allExtensions("/tmp/archive.tar.gz"), {
-    type: "Success",
-    value: ["tar", "gz"],
+  withSuccess(allExtensions("/tmp/archive.tar.gz"), (actual) => {
+    assertEquals(actual, ["tar", "gz"]);
   });
-  assertEquals(allExtensions("README"), {
-    type: "Success",
-    value: [],
+  withSuccess(allExtensions("README"), (actual) => {
+    assertEquals(actual, []);
   });
 });
 
 Deno.test("baseName() returns the final path segment", () => {
-  assertEquals(baseName("/home/user/file.txt"), {
-    type: "Success",
-    value: "file.txt",
+  withSuccess(baseName("/home/user/file.txt"), (actual) => {
+    assertEquals(actual, "file.txt");
   });
-  assertEquals(baseName("/home/user/"), {
-    type: "Success",
-    value: "",
+  withSuccess(baseName("/home/user/"), (actual) => {
+    assertEquals(actual, "");
   });
 });
 
 Deno.test("join() joins paths with a slash", () => {
-  assertEquals(join(["home", "user", "file.txt"]), {
-    type: "Success",
-    value: "home/user/file.txt",
+  withSuccess(join(["home", "user", "file.txt"]), (actual) => {
+    assertEquals(actual, "home/user/file.txt");
   });
-  assertEquals(join([]), {
-    type: "Success",
-    value: "",
+  withSuccess(join([]), (actual) => {
+    assertEquals(actual, "");
   });
 });
 
 Deno.test("execPath() returns the current executable path", () => {
-  assertEquals(execPath(), {
-    type: "Success",
-    value: Deno.execPath(),
+  withSuccess(execPath(), (actual) => {
+    assertEquals(actual, Deno.execPath());
   });
 });
