@@ -199,6 +199,14 @@
           "npm:@praha/error-factory@^1.4.1",
           "npm:valibot@^1.5.0"
         ]
+      },
+      "packages/valibot": {
+        "dependencies": [
+          "jsr:@std/assert@1",
+          "npm:@praha/byethrow@0.12",
+          "npm:@praha/error-factory@^1.4.1",
+          "npm:valibot@^1.5.0"
+        ]
       }
     }
   }
